@@ -1,0 +1,58 @@
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix ev: <http://lv2plug.in/ns/ext/event#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+<https://github.com/ycollet/vopa:VoPa> a lv2:Plugin;
+	a lv2:AmplifierPlugin;
+    doap:name "VoPa amplifier Midi CC";
+    doap:license <http://usefulinc.com/doap/licenses/gpl>;
+	lv2:requiredFeature <http://lv2plug.in/ns/ext/event>;
+    lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-map>;
+	lv2:optionalFeature lv2:hardRtCapable;
+	
+    lv2:port [
+    a lv2:AudioPort;
+    a lv2:OutputPort;
+    lv2:index 0;
+    lv2:symbol "left output";
+    lv2:name "Left Output";
+    ];
+    
+    lv2:port [
+    a lv2:AudioPort;
+    a lv2:InputPort;
+    lv2:index 1;
+    lv2:symbol "right output";
+    lv2:name "Right Output";
+    ];
+
+    lv2:port [
+    a lv2:AudioPort;
+    a lv2:InputPort;
+    lv2:index 2;
+    lv2:symbol "left input";
+    lv2:name "Left Input";
+    ];
+
+    lv2:port [
+    a lv2:AudioPort;
+    a lv2:InputPort;
+    lv2:index 3;
+    lv2:symbol "right input";
+    lv2:name "Right Input";
+    ];
+
+    lv2:port [
+    a lv2:InputPort;
+    a ev:EventPort;
+    lv2:index 4;
+    ev:supportsEvent <http://lv2plug.in/ns/ext/midi#MidiEvent>;
+    lv2:symbol "midi";
+    lv2:name "MIDI Input";
+    ];
+
+    doap:name "VoPa" ;
+    doap:maintainer [ foaf:name "Yann Collette" ] .
