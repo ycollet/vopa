@@ -23,71 +23,62 @@
 
 void runVOPA(LV2_Handle arg, uint32_t nframes) {
   VOPA* so = (VOPA*)arg;
-  lv2_event_begin(&so->in_iterator, so->MidiIn);
-  
   float* left_outbuffer = so->left_output;
   float* right_outbuffer = so->right_output;
   float* left_inbuffer = so->left_input;
   float* right_inbuffer = so->right_input;
-  
-  for(int i = 0; i < nframes; i++) {
-    while(lv2_event_is_valid(&so->in_iterator)) {
-      uint8_t* data;
-      LV2_Event* event = lv2_event_get(&so->in_iterator, &data);
-      if (event->type == 0) {
-	so->event_ref->lv2_event_unref(so->event_ref->callback_data, event);
-      } else if(event->type==so->midi_event_id) {
-	if (event->frames > i) {
+
+  LV2_ATOM_SEQUENCE_FOREACH(so->MidiIn, ev) {
+    if (ev->body.type == so->uris.midi_MidiEvent) {
+      const uint8_t* const msg = (const uint8_t*)(ev + 1);
+      
+      if ((lv2_midi_message_type(msg) & MIDI_COMMANDMASK)==MIDI_CONTROL) {
+	unsigned int command_val = msg[2];
+	
+	switch(msg[1]) {
+	case 7:
+	  so->volume = command_val;
 	  break;
-	} else {
-	  const uint8_t* evt = (uint8_t*)data;
-	  if ((evt[0] & MIDI_COMMANDMASK)==MIDI_CONTROL) {
-	    unsigned int command_val = evt[2];
-	    switch(evt[1]) {
-	    case 7:
-	      so->volume = command_val;
-	      break;
-	    case 10:
-	      so->panning = command_val;
-	      break;
-	    }
-	  }
+	case 10:
+	  so->panning = command_val;
+	  break;
 	}
       }
-      
-      lv2_event_increment(&so->in_iterator);
     }
-
-    float pan_r = sqrt(1 - pow(((so->panning + 127.0) / 256.0), 2.0));
-    float pan_l = (so->panning + 127.0) / 256.0;
-    float vol   = so->volume / 127.0;
-    left_outbuffer[i]  = (left_inbuffer[i] * pan_r + right_inbuffer[i] * pan_l) * vol;
-    right_outbuffer[i] = (left_inbuffer[i] * pan_l + right_inbuffer[i] * pan_r) * vol;
+    
+    for(int i = 0; i < nframes; i++) {
+      float pan_r = sqrt(1 - pow(((so->panning + 127.0) / 256.0), 2.0));
+      float pan_l = (so->panning + 127.0) / 256.0;
+      float vol   = so->volume / 127.0;
+      left_outbuffer[i]  = (left_inbuffer[i] * pan_r + right_inbuffer[i] * pan_l) * vol;
+      right_outbuffer[i] = (left_inbuffer[i] * pan_l + right_inbuffer[i] * pan_r) * vol;
+    }
   }
 }
 
 LV2_Handle instantiateVOPA(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features) {
-  VOPA* so = malloc(sizeof(VOPA));
-  LV2_URI_Map_Feature * map_feature;
-  const LV2_Feature * const * ft;
-  
-  for (ft = features; *ft; ft++) {
-    if (!strcmp((*ft)->URI, "http://lv2plug.in/ns/ext/uri-map")) {
-      map_feature = (*ft)->data;
-      so->midi_event_id = map_feature->uri_to_id(map_feature->callback_data,
-						 "http://lv2plug.in/ns/ext/event",
-						 "http://lv2plug.in/ns/ext/midi#MidiEvent");
-    } else if (!strcmp((*ft)->URI, "http://lv2plug.in/ns/ext/event")) {
-      so->event_ref = (*ft)->data;
+  LV2_URID_Map* map = NULL;
+  for (int i = 0; features[i]; ++i) {
+    if (!strcmp(features[i]->URI, LV2_URID__map)) {
+      map = (LV2_URID_Map*)features[i]->data;
+      break;
     }
   }
-
+  
+  if (!map) {
+    return NULL;
+  }
+  
+  VOPA* self = (VOPA*)calloc(1, sizeof(VOPA));
+  self->map = map;
+  self->uris.midi_MidiEvent = map->map(map->handle, LV2_MIDI__MidiEvent);
+  
   puts( "VOPA v.1.0 by ycollet 2016" );
 		
-  so->volume  = 100;
-  so->panning = 0;
+  self->volume  = 100;
+  self->panning = 0;
   
-  return so;
+  return self;
 }
 
 void cleanupVOPA(LV2_Handle instance) {
@@ -110,7 +101,7 @@ void connectPortVOPA(LV2_Handle instance, uint32_t port, void *data_location) {
     so->right_input = data_location;
     break;
   case PORT_VOPA_MIDI:
-    so->MidiIn = data_location;
+    so->MidiIn = (const LV2_Atom_Sequence*)data_location;
     break;
   default:
     fputs("Warning, unconnected port!\n",stderr);

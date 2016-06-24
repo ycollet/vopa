@@ -19,13 +19,18 @@
  */
 
 #include <lv2.h>
+
 #include <string.h>
-#include "lv2/lv2plug.in/ns/ext/event/event-helpers.h"
-#include "lv2/lv2plug.in/ns/ext/uri-map/uri-map.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
+
+#include "lv2/lv2plug.in/ns/ext/atom/atom.h"
+#include "lv2/lv2plug.in/ns/ext/atom/util.h"
+#include "lv2/lv2plug.in/ns/ext/midi/midi.h"
+#include "lv2/lv2plug.in/ns/ext/urid/urid.h"
+#include "lv2/lv2plug.in/ns/lv2core/lv2.h"
 
 #define MIDI_COMMANDMASK 0xF0
 #define MIDI_CHANNELMASK 0x0F
@@ -61,11 +66,13 @@ typedef struct VOPA_t {
 	float* right_output;
 	float* left_input;
 	float* right_input;
-	LV2_Event_Buffer* MidiIn;
-	LV2_Event_Iterator in_iterator;
-
-	LV2_Event_Feature* event_ref;
-	int midi_event_id;
+	const LV2_Atom_Sequence* MidiIn;
+	// Features
+	LV2_URID_Map* map;
+	
+	struct {
+		LV2_URID midi_MidiEvent;
+	} uris;
 	
 	unsigned int volume;
 	unsigned int panning;
