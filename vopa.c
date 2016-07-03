@@ -107,3 +107,26 @@ void connectPortVOPA(LV2_Handle instance, uint32_t port, void *data_location) {
     fputs("Warning, unconnected port!\n",stderr);
   }
 }
+
+static const LV2_Descriptor vopaDescriptor = {
+  "https://github.com/ycollet/vopa:VoPa",
+  instantiateVOPA,
+  connectPortVOPA,
+  NULL,
+  runVOPA,
+  NULL,
+  cleanupVOPA,
+  NULL
+};
+
+LV2_SYMBOL_EXPORT
+const LV2_Descriptor *lv2_descriptor(uint32_t index)
+{
+  switch (index) {
+  case 0:
+    return &vopaDescriptor;
+  default:
+    return NULL;
+  }
+}
+
