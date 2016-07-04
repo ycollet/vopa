@@ -3,8 +3,8 @@ LIBRARY = libvopa.so
 TTLS = vopa.ttl manifest.ttl
 CC = gcc
 CFLAGS += -Wall -O3 -ffast-math -lm `pkg-config --cflags --libs lv2core` -fPIC
-DESTDIR = /tmp/vopa
-INSTALLDIR = $(DESTDIR)/usr/lib/lv2/
+DESTDIR ?= 
+INSTALLDIR ?= $(DESTDIR)/usr/lib/lv2/
 INSTALLNAME = vopa.lv2/
 $(LIBRARY) : $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -shared -o $@

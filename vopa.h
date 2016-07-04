@@ -50,17 +50,6 @@ LV2_Handle instantiateVOPA(const LV2_Descriptor *descriptor,double s_rate, const
 void cleanupVOPA(LV2_Handle instance);
 void connectPortVOPA(LV2_Handle instance, uint32_t port, void *data_location);
 
-static LV2_Descriptor VOPA_Descriptor = {
-	.URI            = "urn:ycollet:plugins:VoPa",
-	.instantiate    = instantiateVOPA,
-	.connect_port   = connectPortVOPA,
-	.activate       = NULL,
-	.run            = runVOPA,
-	.deactivate     = NULL,
-	.cleanup        = cleanupVOPA,
-	.extension_data = NULL,
-};
-
 typedef struct VOPA_t {
 	float* left_output;
 	float* right_output;
@@ -69,11 +58,7 @@ typedef struct VOPA_t {
 	const LV2_Atom_Sequence* MidiIn;
 	// Features
 	LV2_URID_Map* map;
-	
-	struct {
-		LV2_URID midi_MidiEvent;
-	} uris;
-	
+	LV2_URID midi_MidiEvent;
 	unsigned int volume;
 	unsigned int panning;
 } VOPA;

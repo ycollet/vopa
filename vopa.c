@@ -17,41 +17,50 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define DEBUG 1
+
 #include <math.h>
+#ifdef DEBUG
+#include <stdio.h>
+#endif
 
 #include "vopa.h"
 
 void runVOPA(LV2_Handle arg, uint32_t nframes) {
   VOPA* so = (VOPA*)arg;
-  float* left_outbuffer = so->left_output;
+  float* left_outbuffer  = so->left_output;
   float* right_outbuffer = so->right_output;
-  float* left_inbuffer = so->left_input;
-  float* right_inbuffer = so->right_input;
+  float* left_inbuffer   = so->left_input;
+  float* right_inbuffer  = so->right_input;
 
   LV2_ATOM_SEQUENCE_FOREACH(so->MidiIn, ev) {
-    if (ev->body.type == so->uris.midi_MidiEvent) {
+    if (ev->body.type == so->midi_MidiEvent) {
       const uint8_t* const msg = (const uint8_t*)(ev + 1);
       
       if ((lv2_midi_message_type(msg) & MIDI_COMMANDMASK)==MIDI_CONTROL) {
-	unsigned int command_val = msg[2];
-	
 	switch(msg[1]) {
 	case 7:
-	  so->volume = command_val;
+	  so->volume = msg[2];
 	  break;
 	case 10:
-	  so->panning = command_val;
+	  so->panning = msg[2];
 	  break;
 	}
       }
     }
     
     for(int i = 0; i < nframes; i++) {
-      float pan_r = sqrt(1 - pow(((so->panning + 127.0) / 256.0), 2.0));
-      float pan_l = (so->panning + 127.0) / 256.0;
-      float vol   = so->volume / 127.0;
+      float pan_r = sqrt(1 - pow(((so->panning + 128.0) / 256.0), 2.0));
+      float pan_l = (so->panning + 128.0) / 256.0;
+      float vol   = so->volume / 100.0;
       left_outbuffer[i]  = (left_inbuffer[i] * pan_r + right_inbuffer[i] * pan_l) * vol;
       right_outbuffer[i] = (left_inbuffer[i] * pan_l + right_inbuffer[i] * pan_r) * vol;
+#ifdef DEBUG
+      printf("DEBUG: panning = %d, volume = %d\n", so->panning, so->volume);
+      printf("DEBUG: pan_r = %f, pan_l = %f, vol = %f\n", pan_r, pan_l, vol);
+      printf("DEBUG: left_outbuffer[%d]  = %f  left_inbuffer[%d]  = %f\n", i, left_outbuffer[i], i, left_inbuffer[i]);
+      printf("DEBUG: right_outbuffer[%d] = %f  right_inbuffer[%d] = %f\n", i, right_outbuffer[i], i, right_inbuffer[i]);
+#endif
     }
   }
 }
@@ -71,10 +80,7 @@ LV2_Handle instantiateVOPA(const LV2_Descriptor *descriptor,double s_rate, const
   
   VOPA* self = (VOPA*)calloc(1, sizeof(VOPA));
   self->map = map;
-  self->uris.midi_MidiEvent = map->map(map->handle, LV2_MIDI__MidiEvent);
-  
-  puts( "VOPA v.1.0 by ycollet 2016" );
-		
+  self->midi_MidiEvent = map->map(map->handle, LV2_MIDI__MidiEvent);
   self->volume  = 100;
   self->panning = 0;
   
@@ -108,15 +114,15 @@ void connectPortVOPA(LV2_Handle instance, uint32_t port, void *data_location) {
   }
 }
 
-static const LV2_Descriptor vopaDescriptor = {
-  "https://github.com/ycollet/vopa:VoPa",
-  instantiateVOPA,
-  connectPortVOPA,
-  NULL,
-  runVOPA,
-  NULL,
-  cleanupVOPA,
-  NULL
+static const LV2_Descriptor descriptorVOPA = {
+  .URI            = "https://github.com/ycollet/vopa:VoPa",
+  .instantiate    = instantiateVOPA,
+  .connect_port   = connectPortVOPA,
+  .activate       = NULL,
+  .run            = runVOPA,
+  .deactivate     = NULL,
+  .cleanup        = cleanupVOPA,
+  .extension_data = NULL,
 };
 
 LV2_SYMBOL_EXPORT
@@ -124,7 +130,7 @@ const LV2_Descriptor *lv2_descriptor(uint32_t index)
 {
   switch (index) {
   case 0:
-    return &vopaDescriptor;
+    return &descriptorVOPA;
   default:
     return NULL;
   }
