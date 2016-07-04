@@ -17,12 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define DEBUG 1
-
 #include <math.h>
-#ifdef DEBUG
-#include <stdio.h>
-#endif
 
 #include "vopa.h"
 
@@ -48,20 +43,15 @@ void runVOPA(LV2_Handle arg, uint32_t nframes) {
 	}
       }
     }
-    
-    for(int i = 0; i < nframes; i++) {
-      float pan_r = sqrt(1 - pow(((so->panning + 128.0) / 256.0), 2.0));
-      float pan_l = (so->panning + 128.0) / 256.0;
-      float vol   = so->volume / 100.0;
-      left_outbuffer[i]  = (left_inbuffer[i] * pan_r + right_inbuffer[i] * pan_l) * vol;
-      right_outbuffer[i] = (left_inbuffer[i] * pan_l + right_inbuffer[i] * pan_r) * vol;
-#ifdef DEBUG
-      printf("DEBUG: panning = %d, volume = %d\n", so->panning, so->volume);
-      printf("DEBUG: pan_r = %f, pan_l = %f, vol = %f\n", pan_r, pan_l, vol);
-      printf("DEBUG: left_outbuffer[%d]  = %f  left_inbuffer[%d]  = %f\n", i, left_outbuffer[i], i, left_inbuffer[i]);
-      printf("DEBUG: right_outbuffer[%d] = %f  right_inbuffer[%d] = %f\n", i, right_outbuffer[i], i, right_inbuffer[i]);
-#endif
-    }
+  }
+  
+  float pan_r = sqrt(1 - pow(((so->panning - 1.0) / 127.0), 2.0));
+  float pan_l = (so->panning - 1.0) / 127.0;
+  float vol   = so->volume / 100.0;
+  
+  for(int i = 0; i < nframes; i++) {
+    left_outbuffer[i]  = left_inbuffer[i] * pan_r * vol;
+    right_outbuffer[i] = right_inbuffer[i] * pan_l * vol;
   }
 }
 
