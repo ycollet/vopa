@@ -44,13 +44,14 @@ void runVOPA(LV2_Handle arg, uint32_t nframes) {
       }
     }
   }
-  
-  float pan_r = sqrt(1 - pow(((so->panning - 1.0) / 127.0), 2.0));
-  float pan_l = (so->panning - 1.0) / 127.0;
-  float vol   = so->volume / 100.0;
+
+  float tmp   = so->panning / 127.0;
+  float pan_r = sqrt(1 - tmp);
+  float pan_l = sqrt(tmp);
+  float vol   = so->volume / 127.0;
   
   for(int i = 0; i < nframes; i++) {
-    left_outbuffer[i]  = left_inbuffer[i] * pan_r * vol;
+    left_outbuffer[i]  = left_inbuffer[i]  * pan_r * vol;
     right_outbuffer[i] = right_inbuffer[i] * pan_l * vol;
   }
 }
@@ -72,7 +73,7 @@ LV2_Handle instantiateVOPA(const LV2_Descriptor *descriptor,double s_rate, const
   self->map = map;
   self->midi_MidiEvent = map->map(map->handle, LV2_MIDI__MidiEvent);
   self->volume  = 100;
-  self->panning = 0;
+  self->panning = 64;
   
   return self;
 }
@@ -125,4 +126,3 @@ const LV2_Descriptor *lv2_descriptor(uint32_t index)
     return NULL;
   }
 }
-
