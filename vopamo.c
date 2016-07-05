@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <math.h>
+#include "helper.h"
 
 #include "vopamo.h"
 
@@ -34,9 +34,6 @@ void runVOPA_MO(LV2_Handle arg, uint32_t nframes) {
 	switch(msg[1]) {
 	case 7:
 	  so->volume = msg[2];
-	  break;
-	case 10:
-	  so->panning = msg[2];
 	  break;
 	}
       }
