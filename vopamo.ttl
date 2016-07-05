@@ -1,0 +1,37 @@
+@prefix atom: <http://lv2plug.in/ns/ext/atom#> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix midi: <http://lv2plug.in/ns/ext/midi#> .
+@prefix urid: <http://lv2plug.in/ns/ext/urid#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+<https://github.com/ycollet/vopa:VoPaMo>
+        a lv2:Plugin ;
+        doap:name "VoPa Mono" ;
+	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
+        lv2:project <http://lv2plug.in/ns/lv2> ;
+	lv2:requiredFeature urid:map ;
+	lv2:optionalFeature lv2:hardRtCapable ;
+	
+    lv2:port [
+    a lv2:OutputPort ,
+      lv2:AudioPort ;
+    lv2:index 0 ;
+    lv2:symbol "output" ;
+    lv2:name "Output" ;
+    ], [
+    a lv2:InputPort , 
+      lv2:AudioPort ;
+    lv2:index 1 ;
+    lv2:symbol "input" ;
+    lv2:name "Input" ;
+    ], [
+    a lv2:InputPort ,
+      atom:AtomPort ;
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    lv2:designation lv2:control ;
+    lv2:index 2 ;
+    lv2:symbol "midi_input" ;
+    lv2:name "MIDI Input" ;
+    ] .

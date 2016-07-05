@@ -1,9 +1,9 @@
-#ifndef VOPA_ST_H
-#define VOPA_ST_H
+#ifndef VOPA_MO_H
+#define VOPA_MO_H
 
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * vopa.h
+ * vopamo.h
  *
  * Copyright (C) 2016 - Yann Collette
  *
@@ -41,29 +41,25 @@
 #define MIDI_CONTROL 0xB0
 
 enum PORTS_VOPA_ST {
-	PORT_VOPA_LEFT_OUTPUT=0,
-	PORT_VOPA_RIGHT_OUTPUT,
-	PORT_VOPA_LEFT_INPUT,
-	PORT_VOPA_RIGHT_INPUT,
+	PORT_VOPA_OUTPUT=0,
+	PORT_VOPA_INPUT,
 	PORT_VOPA_MIDI
 };
 
-void runVOPA_ST(LV2_Handle arg, uint32_t nframes);
-LV2_Handle instantiateVOPA_ST(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features);
-void cleanupVOPA_ST(LV2_Handle instance);
-void connectPortVOPA_ST(LV2_Handle instance, uint32_t port, void *data_location);
+void runVOPA_MO(LV2_Handle arg, uint32_t nframes);
+LV2_Handle instantiateVOPA_MO(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features);
+void cleanupVOPA_MO(LV2_Handle instance);
+void connectPortVOPA_MO(LV2_Handle instance, uint32_t port, void *data_location);
 
-typedef struct VOPA_ST_t {
-	float* left_output;
-	float* right_output;
-	const float* left_input;
-	const float* right_input;
+typedef struct VOPA_MO_t {
+	float* output;
+	const float* input;
 	const LV2_Atom_Sequence* MidiIn;
 	// Features
 	LV2_URID_Map* map;
 	LV2_URID midi_MidiEvent;
 	unsigned int volume;
 	unsigned int panning;
-} VOPA_ST;
+} VOPA_MO;
 
 #endif
