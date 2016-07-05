@@ -5,9 +5,9 @@
 @prefix urid: <http://lv2plug.in/ns/ext/urid#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
-<https://github.com/ycollet/vopa:VoPa>
+<https://github.com/ycollet/vopa:VoPaSt>
         a lv2:Plugin ;
-        doap:name "VoPa" ;
+        doap:name "VoPa Stereo" ;
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
         lv2:project <http://lv2plug.in/ns/lv2> ;
 	lv2:requiredFeature urid:map ;
@@ -47,4 +47,3 @@
     lv2:symbol "midi_input" ;
     lv2:name "MIDI Input" ;
     ] .
-

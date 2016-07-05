@@ -21,12 +21,12 @@
 
 #include "vopa.h"
 
-void runVOPA(LV2_Handle arg, uint32_t nframes) {
-  VOPA* so = (VOPA*)arg;
+void runVOPA_ST(LV2_Handle arg, uint32_t nframes) {
+  VOPA_ST* so = (VOPA_ST*)arg;
   float* left_outbuffer  = so->left_output;
   float* right_outbuffer = so->right_output;
-  float* left_inbuffer   = so->left_input;
-  float* right_inbuffer  = so->right_input;
+  const float* left_inbuffer   = so->left_input;
+  const float* right_inbuffer  = so->right_input;
 
   LV2_ATOM_SEQUENCE_FOREACH(so->MidiIn, ev) {
     if (ev->body.type == so->midi_MidiEvent) {
@@ -56,7 +56,7 @@ void runVOPA(LV2_Handle arg, uint32_t nframes) {
   }
 }
 
-LV2_Handle instantiateVOPA(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features) {
+LV2_Handle instantiateVOPA_ST(const LV2_Descriptor *descriptor,double s_rate, const char *path,const LV2_Feature * const* features) {
   LV2_URID_Map* map = NULL;
   for (int i = 0; features[i]; ++i) {
     if (!strcmp(features[i]->URI, LV2_URID__map)) {
@@ -69,7 +69,7 @@ LV2_Handle instantiateVOPA(const LV2_Descriptor *descriptor,double s_rate, const
     return NULL;
   }
   
-  VOPA* self = (VOPA*)calloc(1, sizeof(VOPA));
+  VOPA_ST* self = (VOPA_ST*)calloc(1, sizeof(VOPA));
   self->map = map;
   self->midi_MidiEvent = map->map(map->handle, LV2_MIDI__MidiEvent);
   self->volume  = 100;
@@ -78,12 +78,13 @@ LV2_Handle instantiateVOPA(const LV2_Descriptor *descriptor,double s_rate, const
   return self;
 }
 
-void cleanupVOPA(LV2_Handle instance) {
+void cleanupVOPA_ST(LV2_Handle instance) {
   free(instance);
 }
 
-void connectPortVOPA(LV2_Handle instance, uint32_t port, void *data_location) {
-  VOPA* so = (VOPA*) instance;
+void connectPortVOPA_ST(LV2_Handle instance, uint32_t port, void *data_location) {
+  VOPA_ST* so = (VOPA_ST*) instance;
+
   switch(port) {
   case PORT_VOPA_LEFT_OUTPUT:
     so->left_output = data_location;
@@ -105,14 +106,14 @@ void connectPortVOPA(LV2_Handle instance, uint32_t port, void *data_location) {
   }
 }
 
-static const LV2_Descriptor descriptorVOPA = {
+static const LV2_Descriptor descriptorVOPA_ST = {
   .URI            = "https://github.com/ycollet/vopa:VoPa",
-  .instantiate    = instantiateVOPA,
-  .connect_port   = connectPortVOPA,
+  .instantiate    = instantiateVOPA_ST,
+  .connect_port   = connectPortVOPA_ST,
   .activate       = NULL,
-  .run            = runVOPA,
+  .run            = runVOPA_ST,
   .deactivate     = NULL,
-  .cleanup        = cleanupVOPA,
+  .cleanup        = cleanupVOPA_ST,
   .extension_data = NULL,
 };
 
@@ -121,7 +122,7 @@ const LV2_Descriptor *lv2_descriptor(uint32_t index)
 {
   switch (index) {
   case 0:
-    return &descriptorVOPA;
+    return &descriptorVOPA_ST;
   default:
     return NULL;
   }
