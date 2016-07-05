@@ -5,10 +5,14 @@ A LV2 plugin which control the volume and the panning of a stereo signal using M
 
 To build this plugin, you will need lv2-devel.
 
+```bash
 $ make 
 $ sudo make install
+```
 
 You can specify install PATH via make:
+```bash
 $ sudo make INSTALLDIR=/usr/lib64/lv2 install
+```
 
 The DESTDIR variable can be used for packaging.
