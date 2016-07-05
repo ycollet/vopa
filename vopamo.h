@@ -59,7 +59,6 @@ typedef struct VOPA_MO_t {
 	LV2_URID_Map* map;
 	LV2_URID midi_MidiEvent;
 	unsigned int volume;
-	unsigned int panning;
 } VOPA_MO;
 
 #endif

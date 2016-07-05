@@ -1,7 +1,9 @@
 vopa
 ====
 
-A LV2 plugin which control the volume and the panning of a stereo signal using Midi CC 7 and 10.
+Two plugins are provided:
+ * VoPaSt - a stereo volume and panning plugin controlled via MIDI CC 7 and 10
+ * VoPaMo - a mono volume plugin controlled via MIDI CC
 
 To build this plugin, you will need lv2-devel.
 
