@@ -1,6 +1,6 @@
 TTLS = vopast.ttl vopamo.ttl manifest.ttl
 CC = gcc
-CFLAGS += -Wall -O3 -ffast-math -lm `pkg-config --cflags --libs lv2core` -fPIC
+CFLAGS += -Wall -O3 -ffast-math -std=c99 -lm `pkg-config --cflags --libs lv2core` -fPIC
 #CFLAGS += -DUSE_FAST_SQRT
 DESTDIR ?= 
 INSTALLDIR ?= $(DESTDIR)/usr/lib/lv2/
