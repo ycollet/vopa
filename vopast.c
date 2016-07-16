@@ -21,6 +21,9 @@
 
 #include "vopast.h"
 
+#define VOPA_PAN_DIV 127.0
+#define VOPA_VOL_DIV 100.0
+
 void runVOPA_ST(LV2_Handle arg, uint32_t nframes) {
   VOPA_ST* so = (VOPA_ST*)arg;
   float* left_outbuffer  = so->left_output;
@@ -45,10 +48,10 @@ void runVOPA_ST(LV2_Handle arg, uint32_t nframes) {
     }
   }
 
-  float tmp   = so->panning / 127.0;
+  float tmp   = so->panning / VOPA_PAN_DIV;
   float pan_r = sqrt(1 - tmp);
   float pan_l = sqrt(tmp);
-  float vol   = so->volume / 127.0;
+  float vol   = so->volume / VOPA_VOL_DIV;
   
   for(int i = 0; i < nframes; i++) {
     left_outbuffer[i]  = left_inbuffer[i]  * pan_r * vol;

@@ -21,6 +21,8 @@
 
 #include "vopamo.h"
 
+#define VOPA_VOL_DIR 100.0
+
 void runVOPA_MO(LV2_Handle arg, uint32_t nframes) {
   VOPA_MO* so = (VOPA_MO*)arg;
   float* outbuffer = so->output;
@@ -40,7 +42,7 @@ void runVOPA_MO(LV2_Handle arg, uint32_t nframes) {
     }
   }
 
-  float vol = so->volume / 127.0;
+  float vol = so->volume / VOPA_VOL_DIR;
   
   for(int i = 0; i < nframes; i++) {
     outbuffer[i]  = inbuffer[i] * vol;
