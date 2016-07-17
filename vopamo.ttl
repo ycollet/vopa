@@ -9,9 +9,8 @@
         a lv2:Plugin ;
         doap:name "VoPa Mono" ;
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
-        lv2:project <http://lv2plug.in/ns/lv2> ;
 	lv2:requiredFeature urid:map ;
-	lv2:optionalFeature lv2:hardRtCapable ;
+	lv2:optionalFeature lv2:hardRTCapable ;
 	
     lv2:port [
     a lv2:OutputPort ,
